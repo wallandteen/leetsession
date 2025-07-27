@@ -1,16 +1,13 @@
+[![Install with Tampermonkey](https://tampermonkey.net/favicon.ico)](https://tampermonkey.net/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+
 # LeetSession – Code obsession 🧠⚡️
 
 > Userscript that **revives LeetCode’s removed “Session Management” workflow** by emulating a brand-new sessions: it creates a **self-updating favorite list containing every problem** while leaving all other lists and your global progress untouched.  
-> **Works automatically on both** `leetcode.com/problemset` **and** `leetcode.com/problem-list/*` **pages.**
-
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Userscript size](https://img.shields.io/badge/minified%20size-~9 KB-green)](#)
-[![Install with Tampermonkey](https://tampermonkey.net/favicon.ico)](https://tampermonkey.net/)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
-
+> **Works automatically on both** `leetcode.com/problemset/*` **and** `leetcode.com/problem-list/*` **pages.**
 > **⭐️ If you find the script useful, please give the repo a star — it really helps!**
 
----
 
 ## Table of Contents
 1. [Why?](#why)
@@ -24,7 +21,6 @@
 9. [License](#license)
 10. [Acknowledgements](#acknowledgements)
 
----
 
 ## Why?
 
@@ -38,21 +34,17 @@ In **2024** LeetCode silently disabled **“Create”** button in Session Manage
 * the list auto-syncs daily, so brand-new problems appear automatically **without affecting your progress**;
 * **your existing favorite lists and overall profile stats remain exactly as they were.**
 
----
 
 ## Features
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **One-click "New Session"** | Creates fresh problem list | ✅ |
-| **Auto-naming** | `DD MMM YYYY [LS]` format | ✅ |
-| **Complete problem set** | All 3600+ problems included | ✅ |
-| **Daily auto-sync** | Silent background updates | ✅ |
-| **Zero side effects** | Never touches other lists | ✅ |
-| **Interruption recovery** | Resumes if creation fails | ✅ |
-| **Rate limit handling** | Automatic retry with backoff | ✅ |
+- **One-click "New Session"** - Creates fresh problem list 
+- **Auto-naming** - `DD MMM YYYY [LS]` format 
+- **Complete problem set** - All 3600+ problems included 
+- **Daily auto-sync** - Silent background updates 
+- **Zero side effects** - Never touches other lists 
+- **Interruption recovery** - Resumes if creation fails 
+- **Rate limit handling** - Automatic retry with backoff 
 
----
 
 ## Demo
 
@@ -60,7 +52,6 @@ In **2024** LeetCode silently disabled **“Create”** button in Session Manage
   <img src="screenshot.png" alt="LeetSession screenshot" width="700">
 </p>
 
----
 
 ## Installation
 
@@ -81,14 +72,12 @@ In **2024** LeetCode silently disabled **“Create”** button in Session Manage
 #### Automatic Updates
 The script defines an `@updateURL`, so your manager will fetch new versions automatically.
 
----
 
 ## Usage
 
 * Click **New Session** whenever you want to start from scratch.  
 * Keep the `[LS]` tag in the list name if you want daily auto-sync.
 
----
 
 ## How It Works
 
@@ -97,7 +86,6 @@ The script defines an `@updateURL`, so your manager will fetch new versions auto
 * Stores the last sync date in `localStorage` and runs silently every 24 h.
 * Detects interrupted creation (closed tab, crash) and resumes on the next visit.
 
----
 
 ## FAQ / Troubleshooting
 
@@ -145,19 +133,16 @@ Yes, each account maintains its own sessions independently. The script only oper
 Check the browser console for `[LeetSession]` logs. You'll see sync messages when new problems are added.
 </details>
 
----
 
 ## Contributing
 
 PRs are welcome! ⭐️
 
----
 
 ## License
 
 [MIT](LICENSE) © 2025 Valentin Chizhov
 
----
 
 ## Acknowledgements
 

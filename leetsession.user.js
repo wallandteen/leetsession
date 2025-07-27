@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         LeetSession – Code obsession
-// @namespace    https://valentin.dev/leet-session
+// @namespace    https://github.com/wallandteen
 // @version      1.0.0
 // @description  Work-around for LeetCode’s removed “Session Management” feature (see issue #22883). It emulates the legacy behaviour by creating a self-updating favorite list that contains every problem and automatically syncs it.
 // @author       Valentin Chizhov
@@ -14,15 +14,11 @@
 // @run-at       document-end
 // @noframes
 // @grant        none
-// @compatible   tampermonkey  >=4.18
-// @compatible   violentmonkey >=2.17
-// @compatible   greasemonkey  >=4
 // ==/UserScript==
 
 (() => {
   "use strict";
 
-  /*──────────────────── 0. CONFIGURATION ───────────────────*/
   const MARK = "[LS]";
   const SESSION_FLAGS = {
     CREATING: "[CREATING]", 
@@ -43,7 +39,7 @@
       CREATING_SESSION: "⏳ Creating new session... Please wait.",
       SESSION_CREATED: "✅ Session created successfully!",
       SESSION_FAILED: (error) => `❌ Failed to create session: ${error}`,
-      SYNCED_PROBLEMS: (count) => `✅ Added ${count} problems to sessions.`,
+      SYNCED_PROBLEMS: "✅ All problems synchronized.",
       INCOMPLETE_SESSIONS: "⚠️ Found incomplete sessions. Syncing to complete...",
     },
     
@@ -255,10 +251,14 @@
 
 
   class SessionManager {
-    static async getIncompleteSessions() {
-      const mine = (await Lists.mine()).myCreatedFavoriteList.favorites
+
+    static async getMine() {
+      return (await Lists.mine()).myCreatedFavoriteList.favorites
         .filter((f) => f.name?.includes(MARK));
-      return mine.filter(f => f.name?.includes(SESSION_FLAGS.CREATING));
+    }
+
+    static async getIncompleteSessions() {
+      return (await SessionManager.getMine()).filter(f => f.name?.includes(SESSION_FLAGS.CREATING));
     }
 
     static async hasIncompleteSessions() {
@@ -362,12 +362,18 @@
         
         log(`📝 Created session: ${listName} (${favoriteSlug})`);
 
+        // Add all problems to the new session
+        const slugs = await SessionManager.fetchAllSlugs();
+        await SessionManager.addProblemsToSession(favoriteSlug, slugs, listName);
+        log(`✅ Successfully synchronized session "${listName}"`);
 
         await Lists.reset(favoriteSlug);
+        log("✅ Session progress reset successfully");
         
         // Mark session as ready by removing the CREATING flag
         const finalName = listName.replace(SESSION_FLAGS.CREATING, "");
         await Lists.updateSessionName(favoriteSlug, finalName);
+        log(`✅ Session marked as ready: "${finalName}"`);
         
         // Remove the "creating" toast and show success
         const creatingToast = document.querySelector(".leet.i");
@@ -412,6 +418,8 @@
         }
       }
 
+      const mine = await SessionManager.getMine();
+      
       if (!mine.length) return;
 
       const slugs = await SessionManager.fetchAllSlugs();
@@ -449,7 +457,7 @@
       }
 
       if (addedTotal) {
-        Toast.success(MESSAGES.TOAST.SYNCED_PROBLEMS(addedTotal), 5000);
+        Toast.success(MESSAGES.TOAST.SYNCED_PROBLEMS, 5000);
         log(`✅ Total synced: +${addedTotal} problems`);
       }
 
@@ -463,11 +471,25 @@
 
   class UI {
     static _insertButton() {
-      if (document.getElementById(CONFIG.BTN_ID)) return observer.disconnect();
+      const currentPath = window.location.pathname;
+      const allowedPaths = ['/problemset', '/problem-list', '/studyplan'];
+      const isAllowedPage = allowedPaths.some(path => currentPath.startsWith(path));
+      
+      if (!isAllowedPage) {
+        log(`Skipping button insertion on path: ${currentPath}`);
+        return;
+      }
+      
+      if (document.getElementById(CONFIG.BTN_ID)) {
+        log("Button already exists, skipping...");
+        return; // Don't disconnect observer - keep watching for changes
+      }
 
-      const studyPlanButton = [...document.querySelectorAll("div.flex.flex-col.gap-1 > div")].find(
+      const allDivs = document.querySelectorAll("div.flex.flex-col.gap-1 > div");
+      const studyPlanButton = [...allDivs].find(
         (d) => d.textContent.trim() === "Study Plan"
       );
+      
       if (studyPlanButton) {
         const btn = document.createElement("div");
         btn.id = CONFIG.BTN_ID;
@@ -499,13 +521,16 @@
         btn.appendChild(iconContainer);
         btn.appendChild(textContainer);
         studyPlanButton.parentNode.insertBefore(btn, studyPlanButton.nextSibling);
-        log("✅ Ready");
-        observer.disconnect();
       }
     }
   }
 
-  const observer = new MutationObserver(UI._insertButton);
+  const observer = new MutationObserver(() => {
+    // Only try to insert if button doesn't exist
+    if (!document.getElementById(CONFIG.BTN_ID)) {
+      UI._insertButton();
+    }
+  });
   observer.observe(document.body, { childList: true, subtree: true });
   UI._insertButton(); // initial check
 
@@ -520,11 +545,4 @@
     }
   })();
 
-  // Warn user if they try to close page during session creation
-  window.addEventListener('beforeunload', async (e) => {
-    if (await SessionManager.hasIncompleteSessions()) {
-      e.preventDefault();
-      return MESSAGES.UI.BEFORE_UNLOAD;
-    }
-  });
 })(); 
