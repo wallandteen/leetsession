@@ -1,12 +1,14 @@
-[![Install with Tampermonkey](https://tampermonkey.net/favicon.ico)](https://tampermonkey.net/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 # LeetSession – Code obsession 🧠⚡️
 
+Join the [Reddit discussion](https://www.reddit.com/r/leetcode/comments/1mbu6el/leetcode_removed_sessions_so_i_brought_them_back/)
+
 > Userscript that **revives LeetCode’s removed “Session Management” workflow** by emulating a brand-new sessions: it creates a **self-updating favorite list containing every problem** while leaving all other lists and your global progress untouched.  
 > **Works automatically on both** `leetcode.com/problemset/*` **and** `leetcode.com/problem-list/*` **pages.**
 > **⭐️ If you find the script useful, please give the repo a star — it really helps!**
+> 
 
 
 ## Table of Contents
